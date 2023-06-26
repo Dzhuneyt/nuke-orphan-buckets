@@ -43,6 +43,7 @@ func describeBucketNamesFromActiveStacks() []string {
 	// credentials, and shared configuration files
 	newContext := context.Background()
 	cfg, err := config.LoadDefaultConfig(newContext)
+
 	if err != nil {
 		log.Fatalf("unable to load SDK config, %v", err)
 	}
@@ -65,31 +66,31 @@ func describeBucketNamesFromActiveStacks() []string {
 			log.Fatalf("failed to list stacks, %v", err)
 		}
 
-		stackName := output.StackSummaries[0].StackName
-		fmt.Printf("Stack Name: %s\n", *stackName)
+		// Go through the stacks in this page of results
+		for i := range output.StackSummaries {
+			stackName := output.StackSummaries[i].StackName
+			stackNames = append(stackNames, *stackName)
 
-		stackNames = append(stackNames, *stackName)
+			singleStackResourcesPaginator := cloudformation.NewListStackResourcesPaginator(cloudFormationClient, &cloudformation.ListStackResourcesInput{
+				StackName: stackName,
+			})
 
-		singleStackResourcesPaginator := cloudformation.NewListStackResourcesPaginator(cloudFormationClient, &cloudformation.ListStackResourcesInput{
-			StackName: output.StackSummaries[0].StackName,
-		})
-		for singleStackResourcesPaginator.HasMorePages() {
-			output, err := singleStackResourcesPaginator.NextPage(newContext)
+			// Go through the resources of this Stack
+			for singleStackResourcesPaginator.HasMorePages() {
+				output, err := singleStackResourcesPaginator.NextPage(newContext)
 
-			if err != nil {
-				log.Fatalf("failed to get resources in stack %v - %v", stackName, err)
-			}
+				if err != nil {
+					log.Fatalf("failed to get resources in stack %v - %v", stackName, err)
+				}
 
-			for _, r := range output.StackResourceSummaries {
-				fmt.Printf("%s - %s - %s\n", aws.ToString(r.ResourceType), aws.ToString(r.PhysicalResourceId), aws.ToString(r.LogicalResourceId))
-				if aws.ToString(r.ResourceType) == "AWS::S3::Bucket" {
-					bucketsAcrossStacks = append(bucketsAcrossStacks, aws.ToString(r.PhysicalResourceId))
+				for _, r := range output.StackResourceSummaries {
+					if aws.ToString(r.ResourceType) == "AWS::S3::Bucket" {
+						bucketsAcrossStacks = append(bucketsAcrossStacks, aws.ToString(r.PhysicalResourceId))
+					}
 				}
 			}
 		}
 	}
-
-	fmt.Printf("Total stacks: %d\n", stacksCount)
 
 	return bucketsAcrossStacks
 }
