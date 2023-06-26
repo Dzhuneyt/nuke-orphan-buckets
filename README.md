@@ -1,6 +1,6 @@
-<img alt="repo icon" src="./.github/assets/icon.png"/>
+<img width="300" alt="repo icon" src="./.github/assets/icon.png"/>
 
-# Delete Orphaned S3 buckets
+# Nuke Orphaned S3 buckets
 
 Find S3 buckets that are not managed by active CloudFormation stacks (orphaned buckets) and purge them.
 
