@@ -32,3 +32,4 @@ jobs:
           goarch: ${{ matrix.goarch }}
           compress_assets: 'OFF'
           binary_name: 'nuke-orphan-s3'
+          ldflags: '-s -w' # Reduce binary size
