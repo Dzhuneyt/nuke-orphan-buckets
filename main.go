@@ -22,6 +22,11 @@ func main() {
 		}
 	}
 
+	if len(bucketsToDelete) == 0 {
+		println("No orphan buckets found.")
+		return
+	}
+
 	println("Discovered orphan buckets (not managed by any CloudFormation stack:")
 
 	for _, bucket := range bucketsToDelete {
