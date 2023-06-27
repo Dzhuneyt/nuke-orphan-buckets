@@ -1,4 +1,4 @@
-module aws-s3-delete-orphan-buckets
+module github.com/Dzhuneyt/nuke-orphan-buckets
 
 go 1.18
 

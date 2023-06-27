@@ -2,22 +2,27 @@ package main
 
 import (
 	"context"
+	"github.com/Dzhuneyt/nuke-orphan-buckets/s3helpers"
+	"github.com/Dzhuneyt/nuke-orphan-buckets/util"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 func main() {
+	cfg, _ := config.LoadDefaultConfig(context.Background())
+	bucketBasics := s3helpers.BucketBasics{S3Client: s3.NewFromConfig(cfg)}
+
 	// Get all S3 buckets in the AWS account
-	allBucketsInAccount := describeAllBuckets()
+	allBucketsInAccount := bucketBasics.DescribeAllBuckets()
 
 	// Iterate all CloudFormation stacks and collect "AWS::S3::Bucket" resources
-	bucketsFromActiveStacks := describeBucketNamesFromActiveStacks()
+	bucketsFromActiveStacks := bucketBasics.DescribeBucketNamesFromActiveStacks()
 
 	var bucketsToDelete []string
 
 	// Intersect both arrays and delete buckets that are not in any active CloudFormation stack
 	for _, bucket := range allBucketsInAccount {
-		if !contains(bucketsFromActiveStacks, bucket) {
+		if !util.Contains(bucketsFromActiveStacks, bucket) {
 			bucketsToDelete = append(bucketsToDelete, bucket)
 		}
 	}
@@ -33,12 +38,11 @@ func main() {
 		println(bucket)
 	}
 
-	c := askForConfirmation("Do you really want to delete the buckets listed above?")
+	c := util.AskForConfirmation("Do you really want to delete the buckets listed above?")
 	if c {
 		// Delete bucket contents first, otherwise buckets can not be deleted
 		for _, bucket := range bucketsToDelete {
-			cfg, _ := config.LoadDefaultConfig(context.Background())
-			BucketBasics{S3Client: s3.NewFromConfig(cfg)}.purgeBucket(bucket)
+			bucketBasics.PurgeBucket(bucket)
 		}
 		return
 	}
