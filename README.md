@@ -10,5 +10,5 @@ Use cases:
 ## Getting started
 
 1. `git clone git@github.com:Dzhuneyt/nuke-orphan-buckets.git && cd nuke-orphan-buckets`
-2. Build it: `go run .`
+2. Run it: `go run .`
 4. Optionally provide the AWS region or other optional parameters, respected by the AWS CLI: `AWS_REGION=eu-west-2 go run .`
