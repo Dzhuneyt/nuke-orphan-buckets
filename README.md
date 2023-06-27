@@ -9,6 +9,6 @@ Use cases:
 
 ## Getting started
 
-1. Download one of the recent binaries for your OS from the <a href="https://github.com/Dzhuneyt/nuke-orphan-buckets/releases">Releases</a> page
-2. Execute it `./nuke-orphan-buckets`
-3. Optionally provide the AWS region or other optional parameters, respected by the AWS CLI: `AWS_REGION=eu-west-2 ./nuke-orphan-buckets`
+1. `git clone git@github.com:Dzhuneyt/nuke-orphan-buckets.git && cd nuke-orphan-buckets`
+2. Build it: `go run .`
+4. Optionally provide the AWS region or other optional parameters, respected by the AWS CLI: `AWS_REGION=eu-west-2 go run .`
